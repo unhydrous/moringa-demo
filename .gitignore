@@ -1,0 +1,11 @@
+# Temp files
+*~
+*pid
+*.log
+
+# Compile results
+*pyc
+
+# Testcases
+_trial_temp
+.DS_Store

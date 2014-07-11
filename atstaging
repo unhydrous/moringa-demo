@@ -1,0 +1,77 @@
+#!/bin/sh
+
+# chkconfig: - 65 35
+
+### BEGIN INIT INFO
+# Provides:          $PLUGIN
+# Required-Start:    $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Starts a service for the Twisted plugin '$PLUGIN'
+# Description:       Generic plugin starter for twistd plugins
+### END INIT INFO
+
+# Author: Garret Heaton (powdahound@gmail.com)
+
+PLUGIN="${0##*/}"
+INIT_FILE=/opt/domains/staging.africastalking.com/init.tac
+
+DAEMON=/opt/domains/anaconda/bin/twistd
+PIDFILE=/var/tmp/run/atstaging.pid
+DAEMON_OPTS="--pidfile=$PIDFILE -y $INIT_FILE"
+
+if [ ! -x $DAEMON ]; then
+  echo "ERROR: Can't execute $DAEMON."
+  exit 1
+fi
+
+start_service() {
+    echo -n " * Starting $PLUGIN... "
+    
+    export PYTHONPATH="/opt/domains/staging.africastalking.com"
+    export PATH="/opt/domains/anaconda/bin:$PATH"    
+    $DAEMON $DAEMON_OPTS
+    e=$?
+    if [ $e -eq 1 ]; then
+        echo "already running"
+        return
+    fi
+    
+    if [ $e -eq 255 ]; then
+        echo "couldn't start :("
+        return
+    fi
+    
+    echo "done"
+}
+
+stop_service() {
+    if [ -f $PIDFILE ]; then
+	echo -n " * Stopping $PLUGIN... "
+	kill `cat $PIDFILE`
+    else
+	echo -n "$PLUGIN already stopped "
+    fi
+    
+    echo "done"
+}
+
+case "$1" in
+    start)
+	start_service
+	;;
+    stop)
+	stop_service
+	;;
+    restart)
+	stop_service
+	start_service
+	;;
+    *)
+	echo "Usage: /etc/init.d/$PLUGIN {start|stop|restart}" >&2
+	exit 1
+	;;
+esac
+
+exit 0
