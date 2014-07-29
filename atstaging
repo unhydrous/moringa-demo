@@ -17,7 +17,7 @@
 PLUGIN="${0##*/}"
 INIT_FILE=/opt/domains/staging.africastalking.com/init.tac
 
-DAEMON=/opt/domains/anaconda/bin/twistd
+DAEMON=/opt/resources/anaconda/bin/twistd
 PIDFILE=/var/tmp/run/atstaging.pid
 DAEMON_OPTS="--pidfile=$PIDFILE -y $INIT_FILE"
 

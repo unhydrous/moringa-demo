@@ -5,20 +5,39 @@ from twisted.web.resource import Resource, NoResource
 from twisted.internet import defer
 from twisted.web.server import NOT_DONE_YET
 
-class SafaricomSmsGatewayRequestWebPage(Resource):    
+class SafaricomSmsGatewayRequestWebPage(Resource):
     isLeaf = True
+    
+    def __init__(self, dlrProcessor):
+        Resource.__init__(self)
+        self.dlrProcessor = dlrProcessor
+        
     def render_POST(self, request):
         self._processRequest(request)
         return NOT_DONE_YET        
 
     def _processRequest(self, request):
-        request.setResponseCode(201)
-        request.write(json.dumps({"Message": "Success"}))
-        if not request.finished:
-            request.finish()
+        try:
+            transactionId = cgi.escape(request.args['transactionId'][0])
+            recipients    = cgi.escape(request.args['to'][0])
+        except KeyError, e:
+            raise Exception("Missing parameter %s" % e)
+        else:
+            for recipient in recipients.split(','):
+                self.dlrProcessor.addSafaricomEntry(recipient, transactionId)
+            
+            request.setResponseCode(201)
+            request.write(json.dumps({"Message": "Success"}))
+            if not request.finished:
+                request.finish()
 
 class KenyaSmsGatewayRequestWebPage(Resource):
     isLeaf = True
+
+    def __init__(self, dlrProcessor):
+        Resource.__init__(self)
+        self.dlrProcessor = dlrProcessor
+
     def render_POST(self, request):
         self._processRequest(request)
         return NOT_DONE_YET        
@@ -34,6 +53,8 @@ class KenyaSmsGatewayRequestWebPage(Resource):
             results = {}
             for to in toArr:
                 results[to] = "1701"
+                self.dlrProcessor.addKenyaEntry(to, transactionId)
+
             response = {"TransactionData": results}
             
             request.setResponseCode(201)
@@ -43,6 +64,10 @@ class KenyaSmsGatewayRequestWebPage(Resource):
 
 class RouteSmsGatewayRequestWebPage(Resource):
     isLeaf = True
+
+    def __init__(self, dlrProcessor):
+        Resource.__init__(self)
+        self.dlrProcessor = dlrProcessor
     
     def render_POST(self, request):
         self._processRequest(request)
@@ -59,8 +84,9 @@ class RouteSmsGatewayRequestWebPage(Resource):
             for to in toArr:
                 if to.startswith('+'):
                     to = to[1:]
-
-                results.append("1701|%s|%s" % (to, uuid.uuid4()))
+                messageId = uuid.uuid4()
+                results.append("1701|%s|%s" % (to, messageId))
+                self.dlrProcessor.addRouteSmsEntry(messageId)
 
             response = ",".join(results)
 

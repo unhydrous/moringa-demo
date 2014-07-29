@@ -5,15 +5,19 @@ from smsGateway import SafaricomSmsGatewayRequestWebPage, KenyaSmsGatewayRequest
 
 class ATStagingWebResource(Resource):
     
+    def __init__(self, dlrProcessor):
+        Resource.__init__(self)
+        self.dlrProcessor = dlrProcessor
+    
     def getChild(self, name, request):
-        log.msg("ATUssdWebResource::getChild processing name=%s;uri=%s;clientIP=%s;" % (name, request.uri, request.getClientIP()))
+        log.msg("ATStagingWebResource::getChild processing name=%s;uri=%s;clientIP=%s;" % (name, request.uri, request.getClientIP()))
         if name == 'sms-gateway':
             if 'safaricom' in request.uri:
-                return SafaricomSmsGatewayRequestWebPage()
+                return SafaricomSmsGatewayRequestWebPage(self.dlrProcessor)
             elif 'kenya' in request.uri:
-                return KenyaSmsGatewayRequestWebPage()
+                return KenyaSmsGatewayRequestWebPage(self.dlrProcessor)
             elif 'route-sms' in request.uri:
-                return RouteSmsGatewayRequestWebPage()
+                return RouteSmsGatewayRequestWebPage(self.dlrProcessor)
             elif 'twilio' in request.uri:
                 return TwilioSmsGatewayRequestWebPage()
             else:
