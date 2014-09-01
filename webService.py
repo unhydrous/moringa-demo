@@ -3,6 +3,8 @@ from twisted.web.resource import Resource, NoResource
 
 from smsGateway import SafaricomSmsGatewayRequestWebPage, KenyaSmsGatewayRequestWebPage, RouteSmsGatewayRequestWebPage, TwilioSmsGatewayRequestWebPage 
 
+from snoop import HeartbeatRequestWebPage, PublishErrorRequestWebPage
+
 class ATStagingWebResource(Resource):
     
     def __init__(self, dlrProcessor):
@@ -22,6 +24,13 @@ class ATStagingWebResource(Resource):
                 return TwilioSmsGatewayRequestWebPage()
             else:
                 return NoResource
-
+        
+        elif name == 'snoop':
+            if 'heartbeat' in request.uri:
+                return HeartbeatRequestWebPage()
+            elif 'publish-error' in request.uri:
+                return PublishErrorRequestWebPage()
+            else:
+                return NoResource()
         else:
             return NoResource()
