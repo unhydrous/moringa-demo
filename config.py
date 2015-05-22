@@ -33,6 +33,6 @@ def ConfigSectionMap():
 
 parser = ConfigParser.ConfigParser()
 parser.optionxform=str
-parser.read("/opt/domains/staging.africastalking.com/config.ini")
+parser.read("/opt/domains/demo.africastalking.com/config.ini")
 
 Config = ConfigSectionMap()

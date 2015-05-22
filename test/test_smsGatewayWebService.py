@@ -50,4 +50,11 @@ class TestSmsGatewayWebService(unittest.TestCase):
         self.assertEquals(request.responseCode, 200)
         the_page = "".join(request.written)
         self.assertEquals(the_page, "Some(Twiml)")
-        
+
+    @defer.inlineCallbacks
+    def test_voiceRequest(self):
+        request = yield self.web.post("test/voice")
+        self.assertEquals(request.responseCode, 200)
+        the_page = "".join(request.written)
+        self.assertEquals(the_page, """<?xml version="1.0" encoding="UTF-8"?><Response><Dial phoneNumbers="+254718008164"/></Response>""")
+

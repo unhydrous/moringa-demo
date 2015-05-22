@@ -1,35 +1,21 @@
 from twisted.python import log
 from twisted.web.resource import Resource, NoResource
 
-from smsGateway import SafaricomSmsGatewayRequestWebPage, KenyaSmsGatewayRequestWebPage, RouteSmsGatewayRequestWebPage, TwilioSmsGatewayRequestWebPage 
+from endpoints import UssdRequestWebPage, VoiceRequestWebPage
 
-from snoop import HeartbeatRequestWebPage, PublishErrorRequestWebPage
-
-class ATStagingWebResource(Resource):
+class ATDemoWebResource(Resource):
     
-    def __init__(self, dlrProcessor):
+    def __init__(self, callerRegistry):
         Resource.__init__(self)
-        self.dlrProcessor = dlrProcessor
+        self.callerRegistry = callerRegistry
     
     def getChild(self, name, request):
-        log.msg("ATStagingWebResource::getChild processing name=%s;uri=%s;clientIP=%s;" % (name, request.uri, request.getClientIP()))
-        if name == 'sms-gateway':
-            if 'safaricom' in request.uri:
-                return SafaricomSmsGatewayRequestWebPage(self.dlrProcessor)
-            elif 'kenya' in request.uri:
-                return KenyaSmsGatewayRequestWebPage(self.dlrProcessor)
-            elif 'route-sms' in request.uri:
-                return RouteSmsGatewayRequestWebPage(self.dlrProcessor)
-            elif 'twilio' in request.uri:
-                return TwilioSmsGatewayRequestWebPage()
-            else:
-                return NoResource
-        
-        elif name == 'snoop':
-            if 'heartbeat' in request.uri:
-                return HeartbeatRequestWebPage()
-            elif 'publish-error' in request.uri:
-                return PublishErrorRequestWebPage()
+        log.msg("ATDemoWebResource::getChild processing name=%s;uri=%s;clientIP=%s;" % (name, request.uri, request.getClientIP()))
+        if name == 'test':
+            if 'voice' in request.uri:
+                return VoiceRequestWebPage(self.callerRegistry)
+            elif 'ussd' in request.uri:
+                return UssdRequestWebPage(self.callerRegistry)
             else:
                 return NoResource()
         else:

@@ -15,10 +15,10 @@
 # Author: Garret Heaton (powdahound@gmail.com)
 
 PLUGIN="${0##*/}"
-INIT_FILE=/opt/domains/staging.africastalking.com/init.tac
+INIT_FILE=/opt/domains/demo.africastalking.com/init.tac
 
 DAEMON=/opt/resources/anaconda/bin/twistd
-PIDFILE=/var/tmp/run/atstaging.pid
+PIDFILE=/var/tmp/run/atdemo.pid
 DAEMON_OPTS="--pidfile=$PIDFILE -y $INIT_FILE"
 
 if [ ! -x $DAEMON ]; then
@@ -29,7 +29,7 @@ fi
 start_service() {
     echo -n " * Starting $PLUGIN... "
     
-    export PYTHONPATH="/opt/domains/staging.africastalking.com"
+    export PYTHONPATH="/opt/domains/demo.africastalking.com"
     export PATH="/opt/domains/anaconda/bin:$PATH"    
     $DAEMON $DAEMON_OPTS
     e=$?
