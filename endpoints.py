@@ -33,8 +33,8 @@ class VoiceRequestWebPage(Resource):
             except KeyError, e:
                 pass
 
-            username = "gikandi"
-            apikey   = "fef86cc7a64ef2c1e0533eb0ff11da8c1f5d0b33f6c492fb547972ab9ee2d2a3"
+            username = "APIUsername"
+            apikey   = "APIKey"
             if isActive:
                 gateway  = AfricasTalkingGateway(username, apikey)
                 try:
@@ -89,17 +89,90 @@ class UssdRequestWebPage(Resource):
     def _processRequest(self, request):
         paramStr = request.args
         log.msg('UssdRequest::_processRequest: Received %s' % str(paramStr))        
+        amount = None
         try:
-            phoneNumber = cgi.escape(request.args["phoneNumber"][0])    
+            phoneNumber = cgi.escape(request.args["phoneNumber"][0])
+            text        = cgi.escape(request.args["text"][0])
         except KeyError, e:
             response = "END Invalid request"
         else:
-            if self.callerRegistry.addCaller(phoneNumber):
-                response = "END Welcome to Africa's Talking USSD Services. We will call you shortly with our question of the day."
+            if text == "":
+                response = "CON Welcome to the test.\n1. How much airtime would you like to purchase?"
             else:
-                response = "END Looks like you have already completed today's challenge. Thank you for playing!"
+                try:
+                    amount = int(text)
+                    response = "END Thank you. Please pay at the next prompt"
+                except ValueError:
+                    response = "END Please respond with a number"
+                    
             request.setResponseCode(200)
             request.write(response)
             
             if not request.finished:
                 request.finish()
+
+            if amount is not None:
+                self._promptCheckout(
+                    phoneNumber = phoneNumber,
+                    amount      = amount
+                    )
+
+    def _promptCheckout(self, phoneNumber, amount):
+        username   = "APIUsername"
+        apikey     = "APIKey"
+
+        gateway    = AfricasTalkingGateway(username, apikey)
+
+        try:
+            response = gateway.promptMobilePaymentCheckout(
+                productName_  = "Demo",
+                phoneNumber_  = phoneNumber,
+                currencyCode_ = "KES",
+                amount_       = amount,
+                metadata_     = {"paymentFor" : "Airtime"}
+                )
+            print response
+
+        except AfricasTalkingGatewayException, e:
+            print 'Encountered an error while making the call: %s' % str(e)
+
+class PaymentRequestWebPage(Resource):
+    isLeaf = True
+
+    def render_POST(self, request):
+        self._processRequest(request)
+        return NOT_DONE_YET        
+
+    def _processRequest(self, request):
+        params = json.loads(request.content.read())
+        log.msg('PaymentRequest::_processRequest: Received %s' % str(params))        
+        status      = params["status"]
+        phoneNumber = params["phoneNumber"]
+        value       = params["value"]
+        
+        request.setResponseCode(200)
+        request.write("OK")
+            
+        if not request.finished:
+            request.finish()
+            
+        username   = "APIUsername"
+        apikey     = "APIKey"
+
+        recipients = [{"phoneNumber" : phoneNumber, 
+                       "amount"      : value}]
+        
+        gateway    = AfricasTalkingGateway(username, apikey)
+        
+        try:
+            responses = gateway.sendAirtime(recipients)
+            for response in responses:
+                print "phoneNumber=%s;amount=%s;status=%s;requestId=%s" % (response['phoneNumber'],
+                                                                           response['amount'],
+                                                                           response['status'],
+                                                                           response['requestId'])
+                
+        except AfricasTalkingGatewayException, e:
+            print 'Encountered an error while making the call: %s' % str(e)
+
+                

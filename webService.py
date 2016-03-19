@@ -1,7 +1,7 @@
 from twisted.python import log
 from twisted.web.resource import Resource, NoResource
 
-from endpoints import UssdRequestWebPage, VoiceRequestWebPage
+from endpoints import UssdRequestWebPage, VoiceRequestWebPage, PaymentRequestWebPage
 
 class ATDemoWebResource(Resource):
     
@@ -16,6 +16,8 @@ class ATDemoWebResource(Resource):
                 return VoiceRequestWebPage(self.callerRegistry)
             elif 'ussd' in request.uri:
                 return UssdRequestWebPage(self.callerRegistry)
+            elif 'payment' in request.uri:
+                return PaymentRequestWebPage()
             else:
                 return NoResource()
         else:

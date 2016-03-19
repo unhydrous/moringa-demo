@@ -51,12 +51,12 @@ class CallerRegistry:
             phoneNumbers = self.callers[:10]
             self.callers = self.callers[10:]
             self._makeCallImpl(','.join(phoneNumbers))
-	self.makeCallId = reactor.callLater(1, self._makeCall)
+	self.makeCallId = reactor.callLater(30, self._makeCall)
 
     @defer.inlineCallbacks
     def _makeCallImpl(self, phoneNumbers):
-        username = "gikandi";
-        apikey   = "fef86cc7a64ef2c1e0533eb0ff11da8c1f5d0b33f6c492fb547972ab9ee2d2a3";
+        username = "APIUsername";
+        apikey   = "APIKey";
         callFrom = "+254711082903";
         
         # Create a new instance of our awesome gateway class
