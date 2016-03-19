@@ -156,23 +156,23 @@ class PaymentRequestWebPage(Resource):
         if not request.finished:
             request.finish()
             
-        username   = "APIUsername"
-        apikey     = "APIKey"
+        if status == "Success":
+            username   = "APIUsername"
+            apikey     = "APIKey"
 
-        recipients = [{"phoneNumber" : phoneNumber, 
-                       "amount"      : value}]
+            recipients = [{"phoneNumber" : phoneNumber, 
+                           "amount"      : value}]
         
-        gateway    = AfricasTalkingGateway(username, apikey)
+            gateway    = AfricasTalkingGateway(username, apikey)
         
-        try:
-            responses = gateway.sendAirtime(recipients)
-            for response in responses:
-                print "phoneNumber=%s;amount=%s;status=%s;requestId=%s" % (response['phoneNumber'],
-                                                                           response['amount'],
-                                                                           response['status'],
-                                                                           response['requestId'])
-                
-        except AfricasTalkingGatewayException, e:
-            print 'Encountered an error while making the call: %s' % str(e)
-
+            try:
+                responses = gateway.sendAirtime(recipients)
+                for response in responses:
+                    print "phoneNumber=%s;amount=%s;status=%s;requestId=%s" % (response['phoneNumber'],
+                                                                               response['amount'],
+                                                                               response['status'],
+                                                                               response['requestId'])
+                    
+            except AfricasTalkingGatewayException, e:
+                print 'Encountered an error while making the call: %s' % str(e)
                 
