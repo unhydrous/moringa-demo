@@ -33,8 +33,8 @@ class VoiceRequestWebPage(Resource):
             except KeyError, e:
                 pass
 
-            username = "APIUsername"
-            apikey   = "APIKey"
+            username = "gikandi"
+            apikey   = "fef86cc7a64ef2c1e0533eb0ff11da8c1f5d0b33f6c492fb547972ab9ee2d2a3"
             if isActive:
                 gateway  = AfricasTalkingGateway(username, apikey)
                 try:
@@ -118,8 +118,8 @@ class UssdRequestWebPage(Resource):
                     )
 
     def _promptCheckout(self, phoneNumber, amount):
-        username   = "APIUsername"
-        apikey     = "APIKey"
+        username   = "gikandi"
+        apikey     = "fef86cc7a64ef2c1e0533eb0ff11da8c1f5d0b33f6c492fb547972ab9ee2d2a3"
 
         gateway    = AfricasTalkingGateway(username, apikey)
 
@@ -157,8 +157,8 @@ class PaymentRequestWebPage(Resource):
             request.finish()
             
         if status == "Success":
-            username   = "APIUsername"
-            apikey     = "APIKey"
+            username   = "gikandi"
+            apikey     = "fef86cc7a64ef2c1e0533eb0ff11da8c1f5d0b33f6c492fb547972ab9ee2d2a3"
 
             recipients = [{"phoneNumber" : phoneNumber, 
                            "amount"      : value}]
